@@ -107,7 +107,7 @@ app.get("/push", async (req, res) => {
   const {
     vpn = 1,
     project = "ql-new-cloud",
-    branch = "feature_v1.1.0",
+    branch = "master",
   } = req.query
   pushCode(vpn, project, branch)
     .then(() => {
