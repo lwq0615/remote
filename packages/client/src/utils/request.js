@@ -30,8 +30,11 @@ request.interceptors.response.use(
     return res
   },
   error => {
-    message.error(error.message || '请求失败')
-    return Promise.reject(error)
+    notification.error({
+      description: error.response?.data?.message || error.message || '请求失败',
+      message: '请求错误'
+    })
+    return Promise.reject(error.response?.data || error)
   }
 )
 
