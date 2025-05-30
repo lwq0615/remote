@@ -4,8 +4,8 @@
       <a-form layout="inline" @finish="updateGitCode" :model="form">
         <a-form-item label="vpn">
           <a-select v-model:value="form.vpn" style="width: 200px">
-            <a-select-option value="2">L2TP</a-select-option>
-            <a-select-option value="1">PPTP</a-select-option>
+            <a-select-option value="1">L2TP</a-select-option>
+            <a-select-option value="2">PPTP</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="应用">
@@ -45,7 +45,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import { message } from 'ant-design-vue';
-import { get } from '../utils/requets';
+import { get } from '../utils/request';
 
 const projectOptions = [
   { label: 'ql-new-cloud', value: 'ql-new-cloud' },
@@ -58,7 +58,7 @@ const projectOptions = [
 const form = reactive({
   project: 'ql-new-cloud',
   branch: 'master',
-  vpn: '2',
+  vpn: '1',
 });
 
 const loading = ref(false)
@@ -80,8 +80,8 @@ const loading2 = ref(false)
 const branchInfo = ref('')
 function getBranch() {
   loading2.value = true
-  get("/server/branch", form).then((res) => {
-    branchInfo.value = res
+  get("/branch", form).then((res) => {
+    branchInfo.value = res.split("\n").map(item => item.trim()).filter(Boolean).join('\n')
   }).finally(() => {
     loading2.value = false
   })

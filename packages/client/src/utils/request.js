@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { message } from 'ant-design-vue'
+import { message, notification } from 'ant-design-vue'
 
 // 创建 axios 实例
 const request = axios.create({
-  baseURL: '/server', // 设置统一的请求前缀
+  baseURL: '/api', // 设置统一的请求前缀
   timeout: 15000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json'
@@ -17,6 +17,7 @@ request.interceptors.request.use(
     return config
   },
   error => {
+    notification.error(error.message || '请求失败')
     return Promise.reject(error)
   }
 )
@@ -53,4 +54,7 @@ export function post(url, data) {
 }
 
 // 导出 request 实例
-export default request
+export default {
+  get,
+  post
+}

@@ -1,7 +1,7 @@
 <template>
   <a-layout style="min-height: 100vh">
     <a-layout-header style="background: #001529; color: #fff;">
-      <div style="font-size: 20px; color: #fff;">header</div>
+      <div style="font-size: 20px; color: #fff;">remote</div>
     </a-layout-header>
     <a-layout>
       <a-layout-sider width="200" style="background: #fff;">
