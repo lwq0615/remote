@@ -5,18 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js"
+    "serve": "pnpm --filter server run dev",
+    "client": "pnpm --filter client run dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.11.0",
-  "dependencies": {
-    "express": "^5.1.0",
-    "iconv-lite": "^0.6.3"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
-  }
+  "packageManager": "pnpm@10.11.0"
 }
