@@ -11,7 +11,7 @@
           style="height: 100%; border-right: 0"
         >
           <a-menu-item key="/git">
-            <router-link to="/git">Git代码同步</router-link>
+            <router-link to="/git">Git操作</router-link>
           </a-menu-item>
         </a-menu>
       </a-layout-sider>
