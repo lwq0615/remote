@@ -15,7 +15,7 @@ const vpnConfig = {
     password: 'Liwq@20230722',
   },
 };
-const workspace = 'cd D:\\projects';
+const workspace = 'cd D:\\project';
 
 function getWorkspace(project) {
   return `${workspace}\\${project}`;
@@ -72,7 +72,7 @@ async function executeGitCommands(project, branch) {
     } catch (error) {
       console.error(`命令执行失败: ${command} 错误:`, error);
       throw {
-        message: `命令 ${command} 执行失败`,
+        message: `命令 ${command} 执行失败: ${error.message}`,
         error: error,
       };
     }

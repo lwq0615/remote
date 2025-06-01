@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "serve": "pnpm --filter server run dev",
-    "client": "pnpm --filter client run dev"
+    "client": "pnpm --filter client run dev",
+    "dev": "node run.js"
   },
   "keywords": [],
   "author": "",
