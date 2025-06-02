@@ -1,7 +1,7 @@
 <template>
   <div class="p-4">
-    <a-space>
-      <a-select v-model:value="commnForm.project" show-search style="width: 200px" @change="getBranch">
+    <a-space class="project-selector" direction="vertical" :size="[8, 8]">
+      <a-select v-model:value="commnForm.project" show-search class="project-select" @change="getBranch">
         <a-select-option v-for="option in projectOptions" :key="option.value" :value="option.value">
           {{ option.label }}
         </a-select-option>
@@ -14,34 +14,34 @@
         <div class="mb-4">
           <a-radio-group v-model:value="currentBranch" :options="branchList" @change="onChangeBranch" />
         </div>
-        <a-space>
+        <a-space direction="vertical" :size="[8, 8]" class="branch-create">
           <a-input v-model:value="createForm.branch" placeholder="请输入分支名" />
-          <a-button type="primary" @click="checkoutBranch(createForm.branch)">创建分支</a-button>
+          <a-button type="primary" block @click="checkoutBranch(createForm.branch)">创建分支</a-button>
         </a-space>
       </a-spin>
     </a-card>
 
     <a-card title="同步代码" class="mt-4">
-      <a-form layout="inline" @finish="updateGitCode" :model="form">
+      <a-form :model="form" class="sync-form">
         <a-form-item label="vpn">
-          <a-select v-model:value="form.vpn" style="width: 200px">
+          <a-select v-model:value="form.vpn" class="full-width">
             <a-select-option value="1">L2TP</a-select-option>
             <a-select-option value="2">PPTP</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" html-type="submit" :loading="loading">同步代码</a-button>
+          <a-button type="primary" block html-type="submit" :loading="loading">同步代码</a-button>
         </a-form-item>
       </a-form>
     </a-card>
 
-    <a-card title="代码分支操作" class="mt-4">
-      <a-form layout="inline" @finish="deleteBranch" :model="deleteForm">
+    <a-card title="分支删除" class="mt-4">
+      <a-form :model="deleteForm" class="delete-form">
         <a-form-item label="分支" name="branch" :rules="[{ required: true, message: '请输入分支名' }]">
-          <a-select v-model:value="deleteForm.branch" :options="branchList" style="width: 200px" />
+          <a-select v-model:value="deleteForm.branch" :options="branchList" class="full-width" />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" html-type="submit" :loading="deleteLoading" danger>删除分支</a-button>
+          <a-button type="primary" block html-type="submit" :loading="deleteLoading" danger>删除分支</a-button>
         </a-form-item>
       </a-form>
     </a-card>
@@ -158,3 +158,65 @@ function checkoutBranch(branch) {
     });
 }
 </script>
+
+<style scoped>
+.project-selector {
+  width: 100%;
+}
+
+.project-select {
+  width: 100% !important;
+}
+
+.branch-list {
+  overflow-x: auto;
+}
+
+.branch-create {
+  width: 100%;
+}
+
+.sync-form,
+.delete-form {
+  width: 100%;
+}
+
+.full-width {
+  width: 100% !important;
+}
+
+@media (min-width: 640px) {
+  .project-selector {
+    flex-direction: row !important;
+  }
+
+  .project-select {
+    width: 200px !important;
+  }
+
+  .sync-form,
+  .delete-form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .sync-form .ant-form-item,
+  .delete-form .ant-form-item {
+    margin-bottom: 0;
+    flex: 0 0 auto;
+  }
+
+  .full-width {
+    width: 200px !important;
+  }
+
+  .branch-create {
+    flex-direction: row !important;
+  }
+
+  .branch-create .ant-btn {
+    width: auto;
+  }
+}
+</style>
