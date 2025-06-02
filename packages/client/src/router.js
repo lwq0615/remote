@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   {
+    path: '/',
+    redirect: '/git',
+  },
+  {
     path: '/git',
     name: 'Git',
     component: () => import('./views/git.vue'),
