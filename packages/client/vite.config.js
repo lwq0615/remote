@@ -19,6 +19,12 @@ export default defineConfig({
     port: 3000,
     allowedHosts: true,
     proxy: {
+      '/ws': {
+        target: 'ws://127.0.0.1:8899/ws',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ws/, ''),
+        ws: true,
+      },
       '/api': {
         target: 'http://127.0.0.1:8899',
         changeOrigin: true,

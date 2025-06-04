@@ -2,13 +2,15 @@ import expressWs from 'express-ws';
 import { spawn } from 'child_process';
 import { formatCmdOutput } from './exec.js';
 
-export function startWs(app) {
+export function startWs(app, cwd) {
   expressWs(app);
 
-  app.ws('/terminal', (ws) => {
+  app.ws('/ws/terminal', (ws) => {
     // 创建一个子进程，运行 shell (bash 或 cmd)
-    const shell = process.platform === 'win32' ? 'cmd.exe' : 'bash';
-    const shellProcess = spawn(shell);
+    const shell = process.platform === 'win32' ? 'powershell' : 'bash';
+    const shellProcess = spawn(shell, {
+      cwd
+    });
 
     // 监听子进程输出 (stdout)
     shellProcess.stdout.on('data', (data) => {

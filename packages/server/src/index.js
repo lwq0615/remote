@@ -1,6 +1,7 @@
 import express from 'express';
 import exec, { getExecContext } from './exec.js';
 import { startWs } from './scoket.js';
+import fs from 'fs';
 export const app = express();
 const port = 8899;
 
@@ -16,7 +17,9 @@ const vpnConfig = {
     password: 'Liwq@20230722',
   },
 };
-const workspace = 'cd D:\\projects';
+let cwd = 'D:\\projects';
+cwd = fs.existsSync(cwd) ? cwd : 'D:\\project';
+const workspace = 'cd ' + cwd;
 
 function getWorkspace(project) {
   return `${workspace}\\${project}`;
@@ -177,7 +180,7 @@ app.get('/git/delete', async (req, res) => {
   }
 });
 
-startWs(app)
+startWs(app, cwd);
 
 // 启动服务
 app.listen(port, () => {

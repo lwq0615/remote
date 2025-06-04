@@ -1,12 +1,14 @@
 <template>
-  <div class="terminal-container" ref="terminalContainer"></div>
+  <div class="terminal-container">
+    <div ref="terminalContainer" class="h-full"></div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { Terminal } from 'xterm';
+import { Terminal } from '@xterm/xterm';
 import { FitAddon } from 'xterm-addon-fit'; //终端自适应父元素大小插件
-import 'xterm/css/xterm.css';
+import '@xterm/xterm/css/xterm.css';
 
 const terminalContainer = ref(null); // 终端容器 DOM 引用
 let terminal = null; // xterm 实例
@@ -26,6 +28,7 @@ const strWidth = (str) => {
   return strLen;
 };
 
+// 回格
 function backspace() {
   if (currentLine.value.length > 0) {
     //如果已输入内容不为空，则可以执行删除操作
@@ -86,30 +89,41 @@ onMounted(() => {
   fitAddon.fit();
 
   // 初始化 WebSocket
-  websocket = new WebSocket('ws://localhost:8899/terminal');
+  websocket = new WebSocket(`ws://${window.location.host}/ws/terminal`);
 
   // WebSocket 接收消息
   websocket.onmessage = (event) => {
-    terminal.write(event.data); // 将后端输出写入终端
+    if (event.data.trim().startsWith('PS')) {
+      terminal.write(event.data.trim()); // 将后端输出写入终端
+      return;
+    }
+    terminal.write(event.data.trim().replace(/\n/g, '\r\n') + '\n\r'); // 将后端输出写入终端
   };
 
   // 监听终端用户输入
   terminal.onData((data) => {
     switch (data) {
+      // tab键
+      case '\t':
+        currentLine.value += '  ';
+        terminal.write('  ');
+        break;
       case '\x7F': //backspace
         //如果什么已输入内容为空，则什么也不做
-        backspace()
+        backspace();
         break;
       case '\r':
       case '\n':
         //回车，发送
         if (currentLine.value.trim().length > 0) {
           websocket.send(currentLine.value); //发送
-          let len = currentLine.value.length
+          let len = currentLine.value.length;
           for (let i = 0; i < len; i++) {
             backspace();
           }
           currentLine.value = ''; // 清空输入缓存
+        } else {
+          websocket.send('\n'); //发送
         }
         break;
       default:
@@ -138,5 +152,6 @@ onUnmounted(() => {
   height: 100%;
   background-color: #000;
   font-family: monospace;
+  padding: 10px;
 }
 </style>

@@ -18,7 +18,7 @@
           </a-menu-item>
           <a-menu-item key="/cmd">
             <template #icon>
-              <GithubOutlined />
+              <WindowsOutlined />
             </template>
             <router-link to="/cmd">终端</router-link>
           </a-menu-item>
@@ -35,11 +35,11 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import { GithubOutlined } from '@ant-design/icons-vue'
+import { GithubOutlined, WindowsOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 
 const $route = useRoute()
-const collapsed = ref(true)
+const collapsed = ref(false)
 </script>
 
 <style scoped>
