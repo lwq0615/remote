@@ -22,7 +22,7 @@
     </a-card>
 
     <a-card title="同步代码" class="mt-4">
-      <a-form :model="form" class="sync-form">
+      <a-form :model="form" class="sync-form" @finish="updateGitCode">
         <a-form-item label="vpn">
           <a-select v-model:value="form.vpn" class="full-width">
             <a-select-option value="1">L2TP</a-select-option>
@@ -75,6 +75,7 @@ function updateGitCode() {
   get("/git/push", {
     ...commnForm,
     ...form,
+    branch: currentBranch.value,
   })
     .then(() => {
       message.success("同步成功");

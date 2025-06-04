@@ -63,22 +63,26 @@ async function executeGitCommands(project, branch) {
   const commands = [
     `${getWorkspace(project)} && git pull origin2 master`,
     `${getWorkspace(project)} && git pull origin ${branch}`,
-    `${getWorkspace(project)} && git push origin2 master`,
+    `${getWorkspace(project)} && git push origin2 ${branch}:master`,
     `${getWorkspace(project)} && git push origin ${branch}`,
   ];
 
+  const res = []
   for (const command of commands) {
     try {
       const stdout = await exec(command);
       console.log(`命令执行成功: ${command} 输出:`, stdout);
+      res.push(stdout)
     } catch (error) {
       console.error(`命令执行失败: ${command} 错误:`, error);
+      res.push(error)
       throw {
         message: `命令 ${command} 执行失败: ${error.message}`,
         error: error,
       };
     }
   }
+  return res
 }
 
 async function pushCode(vpn, project, branch) {
@@ -91,15 +95,15 @@ async function pushCode(vpn, project, branch) {
   }
 
   console.log('开始执行 Git 命令...');
-  await executeGitCommands(project, branch);
+  return await executeGitCommands(project, branch);
 }
 
 // 主接口
 app.post('/git/push', async (req, res) => {
   const { vpn = 1, project = 'ql-new-cloud', branch = 'feature_v1.1.0' } = JSON.parse(req.query.params);
   pushCode(vpn, project, branch)
-    .then(() => {
-      res.status(200).json({ message: '操作成功' });
+    .then((data) => {
+      res.status(200).json({ message: '操作成功', data });
     })
     .catch((error) => {
       res.status(500).json(error);
@@ -109,8 +113,8 @@ app.post('/git/push', async (req, res) => {
 app.get('/git/push', async (req, res) => {
   const { vpn = 1, project = 'ql-new-cloud', branch = 'master' } = req.query;
   pushCode(vpn, project, branch)
-    .then(() => {
-      res.status(200).json({ message: '操作成功' });
+    .then((data) => {
+      res.status(200).json({ message: '操作成功', data });
     })
     .catch((error) => {
       res.status(500).json(error);

@@ -4,7 +4,7 @@ import { message, notification } from 'ant-design-vue'
 // 创建 axios 实例
 const request = axios.create({
   baseURL: '/api', // 设置统一的请求前缀
-  timeout: 15000, // 请求超时时间
+  timeout: 120000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json'
   }
