@@ -1,6 +1,7 @@
 import express from 'express';
-import exec from './exec.js';
-const app = express();
+import exec, { getExecContext } from './exec.js';
+import { startWs } from './scoket.js';
+export const app = express();
 const port = 8899;
 
 const vpnConfig = {
@@ -15,7 +16,7 @@ const vpnConfig = {
     password: 'Liwq@20230722',
   },
 };
-const workspace = 'cd D:\\project';
+const workspace = 'cd D:\\projects';
 
 function getWorkspace(project) {
   return `${workspace}\\${project}`;
@@ -67,35 +68,32 @@ async function executeGitCommands(project, branch) {
     `${getWorkspace(project)} && git push origin ${branch}`,
   ];
 
-  const res = []
+  const res = [];
   for (const command of commands) {
-    try {
-      const stdout = await exec(command);
-      console.log(`命令执行成功: ${command} 输出:`, stdout);
-      res.push(stdout)
-    } catch (error) {
-      console.error(`命令执行失败: ${command} 错误:`, error);
-      res.push(error)
-      throw {
-        message: `命令 ${command} 执行失败: ${error.message}`,
-        error: error,
-      };
-    }
+    res.push(command);
+    const stdout = await exec(command);
+    res.push(stdout);
   }
-  return res
+  return res;
 }
 
 async function pushCode(vpn, project, branch) {
-  const isConnected = await checkVPNStatus(vpn);
-  if (!isConnected) {
-    console.log('VPN 未连接，开始连接...');
-    await connectVPN(vpn);
-  } else {
-    console.log('VPN 已连接');
-  }
+  const { startListen, endListen } = getExecContext();
+  startListen();
+  try {
+    const isConnected = await checkVPNStatus(vpn);
+    if (!isConnected) {
+      console.log('VPN 未连接，开始连接...');
+      await connectVPN(vpn);
+    } else {
+      console.log('VPN 已连接');
+    }
 
-  console.log('开始执行 Git 命令...');
-  return await executeGitCommands(project, branch);
+    console.log('开始执行 Git 命令...');
+    await executeGitCommands(project, branch);
+  } finally {
+    return endListen();
+  }
 }
 
 // 主接口
@@ -178,6 +176,8 @@ app.get('/git/delete', async (req, res) => {
     });
   }
 });
+
+startWs(app)
 
 // 启动服务
 app.listen(port, () => {

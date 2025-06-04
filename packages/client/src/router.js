@@ -10,6 +10,11 @@ const routes = [
     name: 'Git',
     component: () => import('./views/git.vue'),
   },
+  {
+    path: '/cmd',
+    name: 'Cmd',
+    component: () => import('./views/cmd.vue'),
+  },
 ];
 
 const router = createRouter({

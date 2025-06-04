@@ -33,10 +33,13 @@
           <a-button type="primary" block html-type="submit" :loading="loading">同步代码</a-button>
         </a-form-item>
       </a-form>
+      <div class="p-2 px-4 mt-4 border rounded" v-if="cmdList.length">
+        <pre class="mb-0">{{ cmdList.join('\n') }}</pre>
+      </div>
     </a-card>
 
     <a-card title="分支删除" class="mt-4">
-      <a-form :model="deleteForm" class="delete-form">
+      <a-form :model="deleteForm" class="delete-form" @finish="deleteBranch">
         <a-form-item label="分支" name="branch" :rules="[{ required: true, message: '请输入分支名' }]">
           <a-select v-model:value="deleteForm.branch" :options="branchList" class="full-width" />
         </a-form-item>
@@ -70,6 +73,7 @@ const form = reactive({
 });
 
 const loading = ref(false);
+const cmdList = ref([])
 function updateGitCode() {
   loading.value = true;
   get("/git/push", {
@@ -77,7 +81,8 @@ function updateGitCode() {
     ...form,
     branch: currentBranch.value,
   })
-    .then(() => {
+    .then((res) => {
+      cmdList.value = res.data || []
       message.success("同步成功");
     })
     .finally(() => {

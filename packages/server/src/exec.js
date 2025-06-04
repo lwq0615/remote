@@ -1,19 +1,52 @@
-import child_process from "child_process";
-import iconv from "iconv-lite";
-const encoding = "cp936";
-const binaryEncoding = "binary";
+import child_process from 'child_process';
+import iconv from 'iconv-lite';
+const encoding = 'cp936';
+const binaryEncoding = 'binary';
+
+export function formatCmdOutput(str) {
+  return iconv.decode(new Buffer(str, binaryEncoding), encoding);
+}
+
+const listenList = [];
 
 export default function exec(command) {
   return new Promise((resolve, reject) => {
+    listenList.forEach((item) => {
+      item.push('> ' + command);
+    });
     child_process.exec(command, { encoding: binaryEncoding }, (error, stdout, stderr) => {
       if (error) {
-        error.message = iconv.decode(new Buffer(error.message, binaryEncoding), encoding);
+        error.message = formatCmdOutput(error.message)
+        listenList.forEach((item) => {
+          item.push(error.toString());
+        });
         reject(error);
       } else if (stderr) {
-        resolve(iconv.decode(new Buffer(stderr, binaryEncoding), encoding));
+        const output = formatCmdOutput(stderr)
+        listenList.forEach((item) => {
+          item.push(output.trim());
+        });
+        resolve(output);
       } else {
-        resolve(iconv.decode(new Buffer(stdout, binaryEncoding), encoding));
+        const output = formatCmdOutput(stdout)
+        listenList.forEach((item) => {
+          item.push(output.trim());
+        });
+        resolve(output);
       }
     });
   });
+}
+
+export function getExecContext() {
+  const listen = [];
+  return {
+    exec: exec,
+    startListen() {
+      listenList.push(listen);
+    },
+    endListen() {
+      return listenList.splice(listenList.indexOf(listen), 1)[0];
+    },
+  };
 }
