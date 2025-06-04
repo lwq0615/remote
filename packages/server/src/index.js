@@ -63,6 +63,7 @@ async function executeGitCommands(project, branch) {
   const commands = [
     `${getWorkspace(project)} && git pull origin2 master`,
     `${getWorkspace(project)} && git pull origin ${branch}`,
+    `${getWorkspace(project)} && git push origin2 master`,
     `${getWorkspace(project)} && git push origin ${branch}`,
   ];
 
