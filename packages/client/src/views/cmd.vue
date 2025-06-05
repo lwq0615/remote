@@ -9,6 +9,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from 'xterm-addon-fit'; //终端自适应父元素大小插件
 import '@xterm/xterm/css/xterm.css';
+import { getCopyText } from '@/utils/common';
 
 const terminalContainer = ref(null); // 终端容器 DOM 引用
 let terminal = null; // xterm 实例
@@ -89,7 +90,7 @@ onMounted(() => {
   fitAddon.fit();
 
   // 初始化 WebSocket
-  websocket = new WebSocket(`ws://${window.location.host}/ws/terminal`);
+  websocket = new WebSocket(`${location.origin.startsWith('https') ? 'wss' : 'ws'}://${window.location.host}/ws/terminal`);
 
   // WebSocket 接收消息
   websocket.onmessage = (event) => {
@@ -103,6 +104,13 @@ onMounted(() => {
   // 监听终端用户输入
   terminal.onData((data) => {
     switch (data) {
+      // 粘贴
+      case '\x16':
+        getCopyText().then((text) => {
+          currentLine.value += text;
+          terminal.write(text);
+        });
+        break;
       // tab键
       case '\t':
         currentLine.value += '  ';
