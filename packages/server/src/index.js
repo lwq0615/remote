@@ -27,9 +27,12 @@ function getWorkspace(project) {
 
 // 检查 VPN 是否已连接
 async function checkVPNStatus(vpn) {
-  const vpnName = vpnConfig[vpn].name;
   try {
     const stdout = await exec('rasdial');
+    if (!vpn) {
+      return !stdout.includes('没有连接');
+    }
+    const vpnName = vpnConfig[vpn].name;
     return stdout.includes(vpnName);
   } catch (error) {
     console.error('检查 VPN 状态时出错:', error);
@@ -185,4 +188,14 @@ startWs(app, cwd);
 // 启动服务
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
+  setInterval(() => {
+    checkVPNStatus().then((isConnected) => {
+      if (!isConnected) {
+        console.log('VPN 未连接，尝试重新连接...');
+        connectVPN(1).catch((error) => {
+          console.error(error);
+        });
+      }
+    });
+  }, 60 * 1000);
 });
