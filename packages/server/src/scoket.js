@@ -7,7 +7,7 @@ export function startWs(app, cwd) {
 
   app.ws('/ws/terminal', (ws) => {
     // 创建一个子进程，运行 shell (bash 或 cmd)
-    const shell = process.platform === 'win32' ? 'powershell' : 'bash';
+    const shell = process.platform === 'win32' ? 'powershell' : 'zsh';
     const shellProcess = spawn(shell, {
       cwd
     });
