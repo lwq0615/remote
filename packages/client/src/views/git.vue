@@ -30,7 +30,7 @@
           </a-select>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" block html-type="submit" :loading="loading">同步代码</a-button>
+          <a-button type="primary" block html-type="submit" :loading="loading || branchLoading">同步代码</a-button>
         </a-form-item>
       </a-form>
       <div class="p-2 px-4 mt-4 border rounded" v-if="cmdList.length">
@@ -76,6 +76,7 @@ const loading = ref(false);
 const cmdList = ref([])
 function updateGitCode() {
   loading.value = true;
+  cmdList.value = []
   get("/git/push", {
     ...commnForm,
     ...form,
