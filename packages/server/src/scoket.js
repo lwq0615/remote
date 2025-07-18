@@ -14,12 +14,12 @@ export function startWs(app, cwd) {
 
     // 监听子进程输出 (stdout)
     shellProcess.stdout.on('data', (data) => {
-      ws.send(formatCmdOutput(data));
+      ws.send(data.toString('utf-8'));
     });
 
     // 监听子进程错误输出 (stderr)
     shellProcess.stderr.on('data', (data) => {
-      ws.send(formatCmdOutput(data));
+      ws.send(data.toString('utf-8'));
     });
 
     // 当子进程关闭时，通知客户端

@@ -203,6 +203,7 @@ startWs(app, cwd);
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
   setInterval(() => {
+    return 
     checkVPNStatus().then((isConnected) => {
       if (!isConnected) {
         console.log("VPN 未连接，尝试重新连接...");
