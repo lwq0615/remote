@@ -72,8 +72,8 @@ async function connectVPN(vpn = 1) {
 
 async function executeGitCommands(project, branch) {
   const commands = [
-    `${getWorkspace(project)} && git pull origin2 master`,
-    `${getWorkspace(project)} && git pull origin ${branch}`,
+    `${getWorkspace(project)} && git pull --no-rebase origin2 master`,
+    `${getWorkspace(project)} && git pull --no-rebase origin ${branch}`,
     `${getWorkspace(project)} && git push origin2 ${branch}:master`,
     `${getWorkspace(project)} && git push origin ${branch}`,
   ];
