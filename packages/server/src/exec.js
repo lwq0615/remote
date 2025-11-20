@@ -12,32 +12,9 @@ export function formatCmdOutput(str) {
 const listenList = [];
 
 export default function exec(command) {
-  return new Promise((resolve, reject) => {
-    listenList.forEach((item) => {
-      item.push(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] ` + command);
-    });
-    child_process.exec(command, { encoding: 'utf-8' }, (error, stdout, stderr) => {
-      if (error) {
-        error.message = formatCmdOutput(error.message)
-        listenList.forEach((item) => {
-          item.push(error.toString());
-        });
-        reject(error);
-      } else if (stderr) {
-        const output = formatCmdOutput(stderr)
-        listenList.forEach((item) => {
-          item.push(output.trim());
-        });
-        resolve(output);
-      } else {
-        const output = formatCmdOutput(stdout)
-        listenList.forEach((item) => {
-          item.push(output.trim());
-        });
-        resolve(output);
-      }
-    });
-  });
+  return execSync(command, {
+    encoding: 'utf8'
+  })
 }
 
 export function getExecContext() {
