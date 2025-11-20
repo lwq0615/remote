@@ -5,7 +5,8 @@ const encoding = 'cp936';
 const binaryEncoding = 'binary';
 
 export function formatCmdOutput(str) {
-  return iconv.decode(new Buffer(str, binaryEncoding), encoding);
+  // return iconv.decode(new Buffer(str, binaryEncoding), encoding);
+  return str
 }
 
 const listenList = [];
@@ -15,7 +16,7 @@ export default function exec(command) {
     listenList.forEach((item) => {
       item.push(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] ` + command);
     });
-    child_process.exec(command, { encoding: binaryEncoding }, (error, stdout, stderr) => {
+    child_process.exec(command, { encoding: 'utf-8' }, (error, stdout, stderr) => {
       if (error) {
         error.message = formatCmdOutput(error.message)
         listenList.forEach((item) => {
