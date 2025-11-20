@@ -87,10 +87,11 @@ async function executeGitPush(project, branch) {
 }
 
 async function executeGitCommit(project, message) {
-  const commands = [
-    `${getWorkspace(project)} && git add .`,
-    `${getWorkspace(project)} && git commit -m '${message}'`,
-  ];
+  const files = await exec('git status --porcelain --untracked-files=all');
+  if (!files) {
+    return;
+  }
+  const commands = [`${getWorkspace(project)} && git add .`, `${getWorkspace(project)} && git commit -m ${message}`];
 
   for (const command of commands) {
     await exec(command);
