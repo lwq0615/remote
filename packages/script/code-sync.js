@@ -129,3 +129,4 @@ async function askUserChoice() {
 
 await askUserChoice();
 
+console.log("完成");
