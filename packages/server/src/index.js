@@ -73,7 +73,7 @@ async function connectVPN(vpn = 1) {
   }
 }
 
-async function executeGitCommands(project, branch) {
+async function executeGitPush(project, branch) {
   const commands = [
     `${getWorkspace(project)} && git pull --no-rebase origin2 master`,
     `${getWorkspace(project)} && git pull --no-rebase origin ${branch}`,
@@ -86,23 +86,31 @@ async function executeGitCommands(project, branch) {
   }
 }
 
+async function executeGitCommit(project, message) {
+  const commands = [
+    `${getWorkspace(project)} && git add .`,
+    `${getWorkspace(project)} && git commit -m '${message}'`,
+  ];
+
+  for (const command of commands) {
+    await exec(command);
+  }
+}
+
 async function pushCode(vpn, project, branch) {
   const { startListen, endListen } = getExecContext();
   startListen();
-  try {
-    const isConnected = await checkVPNStatus(vpn);
-    if (!isConnected) {
-      console.log('VPN 未连接，开始连接...');
-      await connectVPN(vpn);
-    } else {
-      console.log('VPN 已连接');
-    }
-
-    console.log('开始执行 Git 命令...');
-    await executeGitCommands(project, branch);
-  } finally {
-    return endListen();
+  const isConnected = await checkVPNStatus(vpn);
+  if (!isConnected) {
+    console.log('VPN 未连接，开始连接...');
+    await connectVPN(vpn);
+  } else {
+    console.log('VPN 已连接');
   }
+
+  console.log('开始执行 Git 命令...');
+  await executeGitPush(project, branch);
+  return endListen();
 }
 
 // 主接口
@@ -187,11 +195,13 @@ app.get('/git/delete', async (req, res) => {
 });
 
 app.post('/code/sync', async (req, res) => {
-  const { project = 'ql-new-cloud', codeList, vpn } = req.body;
+  const { project = 'ql-new-cloud', codeList, vpn, message } = req.body;
   try {
     if (!project || !Array.isArray(codeList)) {
       return res.status(400).json({ message: '参数格式错误' });
     }
+    const { startListen, endListen } = getExecContext();
+    startListen();
     const workspace = path.resolve(cwd, project);
     for (const item of codeList) {
       const { file, code } = item;
@@ -206,7 +216,7 @@ app.post('/code/sync', async (req, res) => {
       // 写入文件（不存在即创建，存在覆盖）
       await fs.writeFile(filePath, code, 'utf-8');
     }
-
+    await executeGitCommit(project, message);
     const stdout = await exec(`${getWorkspace(project)} && git branch`);
     const branch = stdout
       .split('\n')
@@ -227,8 +237,8 @@ app.post('/code/sync', async (req, res) => {
         };
       })
       .find((item) => item.checked).value;
-    const data = await pushCode(vpn, project, branch);
-    res.status(200).json({ message: '操作成功', data });
+    await pushCode(vpn, project, branch);
+    res.status(200).json({ message: '操作成功', data: endListen() });
   } catch (err) {
     console.error('同步失败：', err);
     res.status(500).json({ message: '同步失败', error: err.message });
