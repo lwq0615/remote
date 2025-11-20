@@ -115,8 +115,8 @@ async function askUserChoice() {
     case 'y':
       console.log('执行清除未提交文件并重新拉取最新代码...');
       // 你的清除未提交文件并重新拉取最新代码逻辑
-      console.log(execSync('git reset --hard HEAD', { cwd: projectPath, encoding: 'utf8' }));;
-      console.log(execSync('git pull', { cwd: projectPath, encoding: 'utf8' }));;
+      console.log(execSync('git reset --hard HEAD', { cwd: projectPath, encoding: 'utf8' }));
+      console.log(execSync('git pull', { cwd: projectPath, encoding: 'utf8' }));
       break;
     case 'n':
       console.log('不执行清除未提交文件并重新拉取最新代码...');
@@ -128,3 +128,4 @@ async function askUserChoice() {
 }
 
 await askUserChoice();
+
