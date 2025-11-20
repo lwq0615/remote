@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { execSync } from 'child_process';
 import { program } from 'commander';
+import inquirer from 'inquirer';
 
 // 定义选项：-m/--mode，描述为 "指定模式"，必填
 program.option('-m, --message <value>', '提交消息');
@@ -9,7 +10,7 @@ program.option('-m, --message <value>', '提交消息');
 program.parse(process.argv);
 const cmdOptions = program.opts();
 
-const serverUrl = 'https://55c9160f.r9.cpolar.cn/api/code/sync'
+const serverUrl = 'https://55c9160f.r9.cpolar.cn/api/code/sync';
 
 let projectPath = process.cwd();
 if (projectPath.endsWith('iass-web')) {
@@ -75,8 +76,8 @@ const codeList = readFilesToCodeArraySync(uncommittedFiles);
 const params = {
   project: projectPath.split(/[\\/]/).pop(),
   codeList,
-  message: cmdOptions.message || 'feat'
-}
+  message: cmdOptions.message || 'feat',
+};
 
 await fetch(serverUrl, {
   method: 'POST',
@@ -87,4 +88,43 @@ await fetch(serverUrl, {
 })
   .then((response) => response.json())
   .then((data) => console.log('成功:', data))
-  .catch((error) => console.error('错误:', error));
+  .catch((error) => {
+    console.error('错误:', error);
+    return Promise.reject(error);
+  });
+
+// 定义二选一的交互逻辑
+async function askUserChoice() {
+  // 发起交互提问
+  const answers = await inquirer.prompt([
+    {
+      type: 'list', // 交互类型：单选列表（二选一核心）
+      name: 'clearAndPull', // 结果存储的键名（后续通过 answers.clearAndPull 获取）
+      message: '是否要清除未提交文件并重新拉取最新代码：', // 给用户的提示文字
+      choices: [
+        // 两个选项（可自定义文字和值）
+        { name: '是', value: 'y' },
+        { name: '否', value: 'n' },
+      ],
+      default: 'y', // 默认选中的选项（可选）
+    },
+  ]);
+
+  // 获取用户选择的结果，执行后续逻辑
+  switch (answers.clearAndPull) {
+    case 'y':
+      console.log('执行清除未提交文件并重新拉取最新代码...');
+      // 你的清除未提交文件并重新拉取最新代码逻辑
+      console.log(execSync('git reset --hard HEAD', { cwd: projectPath, encoding: 'utf8' }));;
+      console.log(execSync('git pull', { cwd: projectPath, encoding: 'utf8' }));;
+      break;
+    case 'n':
+      console.log('不执行清除未提交文件并重新拉取最新代码...');
+      // 你的不执行清除未提交文件并重新拉取最新代码逻辑
+      break;
+    default:
+      console.log('无效选择');
+  }
+}
+
+await askUserChoice();
