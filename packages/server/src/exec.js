@@ -6,15 +6,28 @@ const binaryEncoding = 'binary';
 
 export function formatCmdOutput(str) {
   // return iconv.decode(new Buffer(str, binaryEncoding), encoding);
-  return str
+  return str;
 }
 
 const listenList = [];
 
 export default function exec(command) {
-  return child_process.execSync(command, {
-    encoding: 'utf8'
-  })
+  listenList.forEach((item) => {
+    item.push(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] ` + command);
+  });
+  try {
+    const output = child_process.execSync(command, {
+      encoding: 'utf8',
+    });
+    listenList.forEach((item) => {
+      item.push(output);
+    });
+    return output;
+  } catch (err) {
+    listenList.forEach((item) => {
+      item.push(err.toString());
+    });
+  }
 }
 
 export function getExecContext() {
