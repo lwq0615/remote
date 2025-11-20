@@ -1,4 +1,5 @@
 import child_process from 'child_process';
+import dayjs from 'dayjs';
 import iconv from 'iconv-lite';
 const encoding = 'cp936';
 const binaryEncoding = 'binary';
@@ -12,7 +13,7 @@ const listenList = [];
 export default function exec(command) {
   return new Promise((resolve, reject) => {
     listenList.forEach((item) => {
-      item.push('> ' + command);
+      item.push(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] ` + command);
     });
     child_process.exec(command, { encoding: binaryEncoding }, (error, stdout, stderr) => {
       if (error) {
