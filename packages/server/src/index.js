@@ -187,7 +187,7 @@ app.get('/git/delete', async (req, res) => {
 });
 
 app.post('/code/sync', async (req, res) => {
-  const { project = 'ql-new-cloud', codeList } = req.body;
+  const { project = 'ql-new-cloud', codeList, vpn } = req.body;
   try {
     if (!project || !Array.isArray(codeList)) {
       return res.status(400).json({ message: '参数格式错误' });
@@ -227,7 +227,7 @@ app.post('/code/sync', async (req, res) => {
         };
       })
       .find((item) => item.checked).value;
-    const data = await pushCode(null, project, branch);
+    const data = await pushCode(vpn, project, branch);
     res.status(200).json({ message: '操作成功', data });
   } catch (err) {
     console.error('同步失败：', err);
