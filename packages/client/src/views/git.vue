@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { onUnmounted, reactive, ref } from "vue";
 import { message } from "ant-design-vue";
 import { get } from "../utils/request";
 
@@ -122,9 +122,13 @@ function getBranch() {
     });
 }
 getBranch();
-setInterval(() => {
+const o = setInterval(() => {
   getBranch();
 }, 1000 * 60 * 10)
+
+onUnmounted(() => {
+  clearInterval(o)
+})
 
 const deleteForm = reactive({
   branch: "",
