@@ -122,6 +122,9 @@ function getBranch() {
     });
 }
 getBranch();
+setInterval(() => {
+  getBranch();
+}, 1000 * 60 * 10)
 
 const deleteForm = reactive({
   branch: "",
