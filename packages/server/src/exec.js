@@ -12,7 +12,7 @@ export function formatCmdOutput(str) {
 const listenList = [];
 
 export default function exec(command) {
-  return execSync(command, {
+  return child_process.execSync(command, {
     encoding: 'utf8'
   })
 }
